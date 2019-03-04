@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 const App = () => (
   <div>
-    Hello world; again 2
+    Hello Electron
   </div>
 );
 
