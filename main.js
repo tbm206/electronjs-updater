@@ -4,12 +4,16 @@ const {
   Menu,
 } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 // const {
 //   default: installExtension,
 //   REACT_DEVELOPER_TOOLS,
 //   REDUX_DEVTOOLS,
 // } = require('electron-devtools-installer');
 
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
 
 let win;
 
@@ -68,6 +72,11 @@ function createWindow() {
   ];
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
+function sendStatusToWindow(text) {
+  log.info(text);
+  win.webContents.send('message', text);
 }
 
 autoUpdater.on('checking-for-update', () => {
