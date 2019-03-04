@@ -1,6 +1,6 @@
 {
   "name": "electronjs-updater",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "main.js",
   "author": "Taha Ben Masaud <tbm206d@gmail.com>",
   "license": "MIT",
@@ -10,6 +10,7 @@
     "start": "./node_modules/electron/cli.js ."
   },
   "dependencies": {
+    "electron-updater": "^4.0.6",
     "react": "^16.8.1",
     "react-dom": "^16.8.1"
   },
@@ -24,7 +25,6 @@
     "electron": "^3.0.6",
     "electron-builder": "^20.38.4",
     "electron-devtools-installer": "^2.2.4",
-    "electron-updater": "^4.0.6",
     "file-loader": "^3.0.1",
     "node-sass": "^4.10.0",
     "sass-loader": "^7.1.0",

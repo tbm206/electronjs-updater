@@ -29,6 +29,7 @@ mac:
   target:
     - dmg
     - pkg
+    - zip
   category: public.app-category.developer-tools
 
 win:

@@ -3,7 +3,7 @@ const {
   BrowserWindow,
   Menu,
 } = require('electron');
-const { autoUpdater } = require("electron-updater")
+const { autoUpdater } = require('electron-updater');
 // const {
 //   default: installExtension,
 //   REACT_DEVELOPER_TOOLS,
