@@ -1,0 +1,42 @@
+appId: com.tbm206.electronjsupdater
+productName: ElectronTest
+
+asar: true
+
+directories:
+  buildResources: build/
+  output: dist/
+
+files:
+  - package.json
+  - src/
+  - build/bundle.js
+  - index.html
+  - main.js
+  - node_modules/
+
+dmg:
+  contents:
+    - type: link
+      path: /Applications
+      x: 410
+      y: 150
+    - type: file
+      x: 130
+      y: 150
+
+mac:
+  target:
+    - dmg
+    - pkg
+  category: public.app-category.developer-tools
+
+win:
+  target: nsis
+
+linux:
+  executableName: atm
+  synopsis: An ElectronJs Test
+  category: Development
+  target:
+    - AppImage

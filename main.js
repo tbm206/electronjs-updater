@@ -1,72 +1,75 @@
-// This is free and unencumbered software released into the public domain.
-// See LICENSE for details
-
-const {app, BrowserWindow, Menu, protocol, ipcMain} = require('electron');
-const log = require('electron-log');
-const {autoUpdater} = require("electron-updater");
-
-//-------------------------------------------------------------------
-// Logging
-//
-// THIS SECTION IS NOT REQUIRED
-//
-// This logging setup is not required for auto-updates to work,
-// but it sure makes debugging easier :)
-//-------------------------------------------------------------------
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
-log.info('App starting...');
-
-//-------------------------------------------------------------------
-// Define the menu
-//
-// THIS SECTION IS NOT REQUIRED
-//-------------------------------------------------------------------
-let template = []
-if (process.platform === 'darwin') {
-  // OS X
-  const name = app.getName();
-  template.unshift({
-    label: name,
-    submenu: [
-      {
-        label: 'About ' + name,
-        role: 'about'
-      },
-      {
-        label: 'Quit',
-        accelerator: 'Command+Q',
-        click() { app.quit(); }
-      },
-    ]
-  })
-}
+const {
+  app,
+  BrowserWindow,
+  Menu,
+} = require('electron');
+const { autoUpdater } = require("electron-updater")
+// const {
+//   default: installExtension,
+//   REACT_DEVELOPER_TOOLS,
+//   REDUX_DEVTOOLS,
+// } = require('electron-devtools-installer');
 
 
-//-------------------------------------------------------------------
-// Open a window that displays the version
-//
-// THIS SECTION IS NOT REQUIRED
-//
-// This isn't required for auto-updates to work, but it's easier
-// for the app to show a window than to have to click "About" to see
-// that updates are working.
-//-------------------------------------------------------------------
 let win;
 
-function sendStatusToWindow(text) {
-  log.info(text);
-  win.webContents.send('message', text);
-}
-function createDefaultWindow() {
-  win = new BrowserWindow();
-  win.webContents.openDevTools();
+function createWindow() {
+  // Create the browser window.
+  win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    minWidth: 1080,
+    minHeight: 760,
+  });
+
+  // Add extensions
+  // installExtension(REACT_DEVELOPER_TOOLS)
+  //   .then(name => console.log(`Added Extension:  ${name}`))
+  //   .catch(err => console.log('An error occurred: ', err));
+  // installExtension(REDUX_DEVTOOLS)
+  //   .then(name => console.log(`Added Extension:  ${name}`))
+  //   .catch(err => console.log('An error occurred: ', err));
+
+  // and load the index.html of the app.
+  win.loadFile('./index.html');
+
+  // Open the DevTools.
+  // win.webContents.openDevTools();
+
+  // Emitted when the window is closed.
   win.on('closed', () => {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
     win = null;
   });
-  win.loadURL(`file://${__dirname}/version.html#v${app.getVersion()}`);
-  return win;
+
+  const template = [
+    {
+      label: 'Application',
+      submenu: [
+        { label: 'About Application', selector: 'orderFrontStandardAboutPanel:' },
+        { type: 'separator' },
+        { label: 'Quit', accelerator: 'Command+Q', click: () => app.quit() },
+      ],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+        { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' },
+        { type: 'separator' },
+        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+        { label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' },
+      ],
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
+
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
 })
@@ -88,55 +91,28 @@ autoUpdater.on('download-progress', (progressObj) => {
 autoUpdater.on('update-downloaded', (info) => {
   sendStatusToWindow('Update downloaded');
 });
-app.on('ready', function() {
-  // Create the Menu
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
 
-  createDefaultWindow();
-});
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', createWindow);
+
+// Quit when all windows are closed.
 app.on('window-all-closed', () => {
-  app.quit();
+  // On macOS it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
-//
-// CHOOSE one of the following options for Auto updates
-//
-
-//-------------------------------------------------------------------
-// Auto updates - Option 1 - Simplest version
-//
-// This will immediately download an update, then install when the
-// app quits.
-//-------------------------------------------------------------------
-app.on('ready', function()  {
-  autoUpdater.checkForUpdatesAndNotify();
+app.on('activate', () => {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (win === null) {
+    createWindow();
+  }
 });
 
-//-------------------------------------------------------------------
-// Auto updates - Option 2 - More control
-//
-// For details about these events, see the Wiki:
-// https://github.com/electron-userland/electron-builder/wiki/Auto-Update#events
-//
-// The app doesn't need to listen to any events except `update-downloaded`
-//
-// Uncomment any of the below events to listen for them.  Also,
-// look in the previous section to see them being used.
-//-------------------------------------------------------------------
-// app.on('ready', function()  {
-//   autoUpdater.checkForUpdates();
-// });
-// autoUpdater.on('checking-for-update', () => {
-// })
-// autoUpdater.on('update-available', (info) => {
-// })
-// autoUpdater.on('update-not-available', (info) => {
-// })
-// autoUpdater.on('error', (err) => {
-// })
-// autoUpdater.on('download-progress', (progressObj) => {
-// })
-// autoUpdater.on('update-downloaded', (info) => {
-//   autoUpdater.quitAndInstall();  
-// })
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
